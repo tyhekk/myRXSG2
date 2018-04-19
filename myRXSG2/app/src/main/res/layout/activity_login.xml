@@ -30,22 +30,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ImageView
                 android:id="@+id/verificationCodeImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 app:srcCompat="@drawable/ic_launcher_background"
                 tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="134dp"/>
+                tools:layout_editor_absoluteY="134dp" />
             <EditText
                 android:id="@+id/login_verificationCodeEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="0dp"
                 android:contentDescription="验证码"
-                android:ems="6"
+                android:ems="4"
                 android:inputType="textPersonName"
                 tools:layout_editor_absoluteX="138dp"
                 tools:layout_editor_absoluteY="138dp"
