@@ -9,13 +9,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class socketService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     Socket socket = null;
     Socket receiveSocket = null;
-    String test = "123";
+    Map<String,Object> Generals = new HashMap<String,Object>();
     public socketService() {
         super("socketService");
     }
@@ -39,9 +42,10 @@ public class socketService extends IntentService {
             }while(receiveSocketNoReturn("030067000000") == false);
             //System.out.println(getMonarchInfo());
             // TODO:获取君主信息
+            getGeralsInfo();
             // 此处循环执行游戏
-            while(true){
-
+            if(true){
+                //SockTools.analyzeHexStr(null);
             }
         }
 
@@ -52,11 +56,36 @@ public class socketService extends IntentService {
     private String getGeralsInfo(){
         try {
             String data = link("010031870100", "00000000");
-            System.out.println(data);
+            //System.out.println(data);
             while (send(data)) {
-                data = receiveSocket("020031870100");
-                //int num = convertHexstr2Int(data.substring(28 * 2, 30 * 2));
-                //return new String(convertHexstr2byte(data.substring(30 * 2, (30 + num) * 2)), "utf-8");
+                while((data = receiveSocket("020031870100")) == null);
+                // 分析数据
+                AnalyzeData analysis = new AnalyzeData();
+                analysis.setData(data);
+
+                if((int)analysis.analyze("bool") == 0){
+                    return "";
+                }
+                else
+                {
+                    while((int)analysis.analyze("bool") == 1){
+                        System.out.println(analysis.analyze("id"));
+                        System.out.println(analysis.analyze("int"));
+                        System.out.println(analysis.analyze("id"));
+                        System.out.println(analysis.analyze("int"));
+                        System.out.println(analysis.analyze("int"));
+                        System.out.println(analysis.analyze("int"));
+                        System.out.println(analysis.analyze("id"));
+                        System.out.println(analysis.analyze("int"));
+                        System.out.println((double)analysis.analyze("double"));
+                        System.out.println((double)analysis.analyze("double"));
+                        System.out.println((double)analysis.analyze("double"));
+                        System.out.println((double)analysis.analyze("double"));
+                        System.out.println((double)analysis.analyze("double"));
+                    }
+                }
+
+                return "";
             }
         }catch (Exception e){
             System.out.println("String getGeralsInfo() Error");
@@ -104,7 +133,6 @@ public class socketService extends IntentService {
             InputStream inputStream = socket.getInputStream();
             while(true){
                 String s = getLengthString(inputStream,18,true);
-
                 //System.out.println(s);
 
                 if(s.startsWith(header)){
