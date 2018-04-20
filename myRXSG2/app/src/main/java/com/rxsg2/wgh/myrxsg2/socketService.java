@@ -18,7 +18,7 @@ public class socketService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     Socket socket = null;
     Socket receiveSocket = null;
-    Map<String,Object> Generals = new HashMap<String,Object>();
+    Generals generals = new Generals();
     public socketService() {
         super("socketService");
     }
@@ -40,9 +40,10 @@ public class socketService extends IntentService {
             do {
                 login(g_host, g_port, g_server_id, g_pass_type, g_pass_port, g_pass_token, g_version);
             }while(receiveSocketNoReturn("030067000000") == false);
+            giftForSignin();
             //System.out.println(getMonarchInfo());
             // TODO:获取君主信息
-            getGeralsInfo();
+            //getGeralsInfo();
             // 此处循环执行游戏
             if(true){
                 //SockTools.analyzeHexStr(null);
@@ -50,6 +51,19 @@ public class socketService extends IntentService {
         }
 
 
+    }
+    
+    // TODO:签到，领取礼包
+    private void giftForSignin(){
+        try {
+            String data = link("0100e2890100", "");
+            send(data);
+            data = link("0100428a0100", "");
+            send(data);
+        }catch (Exception e){
+            System.out.println("void giftForSignin() Error");
+            return;
+        }
     }
 
     // TODO:获取将领信息
@@ -69,19 +83,13 @@ public class socketService extends IntentService {
                 else
                 {
                     while((int)analysis.analyze("bool") == 1){
-                        System.out.println(analysis.analyze("id"));
-                        System.out.println(analysis.analyze("int"));
-                        System.out.println(analysis.analyze("id"));
-                        System.out.println(analysis.analyze("int"));
-                        System.out.println(analysis.analyze("int"));
-                        System.out.println(analysis.analyze("int"));
-                        System.out.println(analysis.analyze("id"));
-                        System.out.println(analysis.analyze("int"));
-                        System.out.println((double)analysis.analyze("double"));
-                        System.out.println((double)analysis.analyze("double"));
-                        System.out.println((double)analysis.analyze("double"));
-                        System.out.println((double)analysis.analyze("double"));
-                        System.out.println((double)analysis.analyze("double"));
+                        generals.addGeneral((String)analysis.analyze("id"),(int)analysis.analyze("int"),
+                                (String)analysis.analyze("id"),(int)analysis.analyze("int"),
+                                (int)analysis.analyze("int"),(int)analysis.analyze("int"),
+                                (String)analysis.analyze("id"),(int)analysis.analyze("int"),
+                                (double)analysis.analyze("double"),(double)analysis.analyze("double"),
+                                (double)analysis.analyze("double"),(double)analysis.analyze("double"),
+                                (double)analysis.analyze("double"));
                     }
                 }
 

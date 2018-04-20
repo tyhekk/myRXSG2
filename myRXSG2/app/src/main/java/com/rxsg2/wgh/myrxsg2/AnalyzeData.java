@@ -59,7 +59,7 @@ public class AnalyzeData {
         for (int i = 7; i >=0; i--) {
             value |= ((long) (buff[i] & 0xff)) << (8 * i);
         }
-        System.out.println(Double.longBitsToDouble(value));
+        //System.out.println(Double.longBitsToDouble(value));
         return Double.longBitsToDouble(value);
     }
     // TODO:将BYTE[]中的某一段转为String
