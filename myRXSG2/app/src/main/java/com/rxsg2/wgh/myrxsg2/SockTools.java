@@ -7,61 +7,17 @@ import java.util.List;
 
 public class SockTools {
 
-    public static List analyzeHexStr(String s,List listData){
-        List<String> list = new ArrayList<String>();
-        list.add(s);
-        return analyzeHexStr(list,listData);
-    }
-
-    public static List analyzeHexStr(List<String> list,List listData){
-
-        String hexstr = (String)listData.get(listData.size() - 1);
-        List result = new ArrayList<>();
-        // TODO:将Hex字符串转为Byte[]处理
-        byte[] bytes = convertHexstr2byte(hexstr);
-        int index = 0;
-        int length = (hexstr.length()/2);
-        if(index >= length){return null;}
-        for(String s:list){
-            // 一个字节bool
-            if("bool".equals(s)){
-                if((index + 1) > length){result.add(null); return result;};
-                result.add((int)bytes[index]);
-                index += 1;
-            }
-            // id两位长度+字符串
-            else if("id".equals(s)){
-                if(( index + 2 ) > length){result.add(null); return result;};
-                int num = converBytes2Int(bytes,index,index + 2);
-
-                index += 2;
-                if(( index + num ) > length){result.add(null); return result;};
-                result.add( converBytes2Str(bytes,index,index + num) );
-                index += num;
-            }
-            // int 4字节
-            else if("int".equals(s)){
-                if(( index + 4 ) > length){result.add(null); return result;};
-                result.add(converBytes2Int(bytes,index,index + 4));
-                index += 4;
-            }
-            // double 8字节
-            else if("double".equals(s)){
-                if(( index + 8 ) > length){result.add(null); return result;};
-                result.add(converBytes2Double(bytes,index,index + 8));
-                index += 8;
-            }
-        }
-        // 没有分析完的，返回剩余的String
-        if(index >= length){
-            result.add(null); return result;
-        }
-        else
-        {
-            result.add(hexstr.substring(index*2)); return result;
+    // TODO:将id转化为长度信息+id模式
+    public static String converID2Hexstr(String id){
+        try {
+            String idstr = convertBytes2Hexstr(id.getBytes("UTF-8"),(id.getBytes("UTF-8")).length);
+            String hexstr = convertInt2bytestr(idstr.length(),2);
+            return hexstr + idstr;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
         }
     }
-
     // TODO:将BYTE[]中的某一段转为double
     public static double converBytes2Double(byte[] bytes,int start,int end) {
         byte[] buff = new byte[end - start];
@@ -106,7 +62,7 @@ public class SockTools {
         return bytes;
     }
     // TODO:将byte[]变为十六进制的字符串
-    public static  String convertBytes2bytestr(byte[] bytes,int length){
+    public static  String convertBytes2Hexstr(byte[] bytes,int length){
         char[] c = new char[length*2];
         for(int i = 0;i < length;i++) {
             String s = convertInt2bytestr(bytes[i],1);

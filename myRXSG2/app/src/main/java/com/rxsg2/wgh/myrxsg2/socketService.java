@@ -40,10 +40,10 @@ public class socketService extends IntentService {
             do {
                 login(g_host, g_port, g_server_id, g_pass_type, g_pass_port, g_pass_token, g_version);
             }while(receiveSocketNoReturn("030067000000") == false);
-            giftForSignin();
+            //giftForSignin();
             //System.out.println(getMonarchInfo());
             // TODO:获取君主信息
-            //getGeralsInfo();
+            getGeralsInfo();
             // 此处循环执行游戏
             if(true){
                 //SockTools.analyzeHexStr(null);
@@ -72,7 +72,9 @@ public class socketService extends IntentService {
             String data = link("010031870100", "00000000");
             //System.out.println(data);
             while (send(data)) {
-                while((data = receiveSocket("020031870100")) == null);
+                if((data = receiveSocket("020031870100")) == null){
+                    continue;
+                }
                 // 分析数据
                 AnalyzeData analysis = new AnalyzeData();
                 analysis.setData(data);
@@ -108,7 +110,9 @@ public class socketService extends IntentService {
             String data = link("0100a6880100", "01000000");
             System.out.println(data);
             while (send(data)) {
-                data = receiveSocket("03002c880100");
+                if((data = receiveSocket("03002c880100")) == null){
+                    continue;
+                }
                 int num = convertHexstr2Int(data.substring(28 * 2, 30 * 2));
                 return new String(convertHexstr2byte(data.substring(30 * 2, (30 + num) * 2)), "utf-8");
             }
@@ -125,9 +129,11 @@ public class socketService extends IntentService {
             OutputStream os = socket.getOutputStream();
             os.write(convertHexstr2byte(data));
             os.flush();
+            Thread.sleep(10);
             return true;
         }catch (Exception e){
             System.out.println("boolean send(String data) error");
+            e.printStackTrace();
             return false;
         }
     }
@@ -141,8 +147,10 @@ public class socketService extends IntentService {
             InputStream inputStream = socket.getInputStream();
             while(true){
                 String s = getLengthString(inputStream,18,true);
-                //System.out.println(s);
-
+                if(s == null){
+                    print(header + ":没有接收到！");
+                    return null;
+                }
                 if(s.startsWith(header)){
                     return getLengthString(inputStream,getLength(s),true);
                 }
@@ -153,6 +161,7 @@ public class socketService extends IntentService {
             }
         }catch (Exception e){
             System.out.println("String receiveSocket(String header) Error");
+            e.printStackTrace();
             return null;
         }
     }
@@ -162,7 +171,10 @@ public class socketService extends IntentService {
             InputStream inputStream = socket.getInputStream();
             while(true){
                 String s = getLengthString(inputStream,18,true);
-
+                if(s == null){
+                    print(header + ":没有接收到！");
+                    return false;
+                }
                 if(s.startsWith(header)){
                     getLengthString(inputStream,getLength(s),false);
                     return true;
@@ -174,6 +186,7 @@ public class socketService extends IntentService {
             }
         }catch (Exception e){
             System.out.println("boolean receiveSocketNoReturn(String header) Error");
+            e.printStackTrace();
             return false;
         }
     }
@@ -184,32 +197,45 @@ public class socketService extends IntentService {
     }
     // TODO:获取固定长度的Hex字符串,获取失败返回null
     private String getLengthString(InputStream inputStream,int length,boolean isreturn){
-        int temp = 0;
-        int s_num = 0;
+        int temp = 0,s_num = 0;
         String s = "";
+        if(length < 0){length = 1000;}
+        if(length == 0){return s;}
         // 相读取length个字符
         byte[] buffer = new byte[length];
         try {
-            while ((temp = inputStream.read(buffer)) > 0) {
+            while (true) {
+                // 给10次机会,每次延时5ms
+                for(int i = 0;i < 20;i++){
+                    if(inputStream.available()!= 0){
+                        break;
+                    }
+                    if(i == 20){
+                        return null;
+                    }
+                    Thread.sleep(3);
+                }
+                temp = inputStream.read(buffer);
                 s_num += temp;
                 if(isreturn){
-                    s += convertBytes2bytestr(buffer, temp);
+                    s += SockTools.convertBytes2Hexstr(buffer, temp);
                 }
                 if (s_num < length) {
                     buffer = new byte[length - s_num];
                 } else {
-                    break;
+                    // 如果读取长度正好，那么久返回s,如果大于，则返回null
+                    if(s_num != length){
+                        return null;
+                    }
+                    else {
+                        return s;
+                    }
                 }
             }
-            if(s_num != length){
-                return null;
-            }
-            else
-            {
-                return s;
-            }
+
         }catch(Exception e){
             System.out.println("String getLenthString Error");
+            e.printStackTrace();
             return null;
         }
     }
@@ -324,5 +350,8 @@ public class socketService extends IntentService {
             hex.append(Integer.toHexString(b & 0xFF));
         }
         return hex.toString();
+    }
+    private void print(Object str){
+        System.out.println(str);
     }
 }
