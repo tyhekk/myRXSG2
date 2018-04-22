@@ -40,17 +40,75 @@ public class socketService extends IntentService {
             do {
                 login(g_host, g_port, g_server_id, g_pass_type, g_pass_port, g_pass_token, g_version);
             }while(receiveSocketNoReturn("030067000000") == false);
-            //giftForSignin();
-            //System.out.println(getMonarchInfo());
+            //placeTreasure();
+            //guanXing();
+            //SigninPerMonth();
+            //getGiftFromLuoYang();
+            for(int i = 0;i < 100;i++) {
+                patrol(10000, 50);
+            }
+
             // TODO:获取君主信息
-            getGeralsInfo();
+            //getGeralsInfo();
             // 此处循环执行游戏
             if(true){
-                //SockTools.analyzeHexStr(null);
+                print("while");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
+    }
 
+    // TODO:放置珍宝
+    private void placeTreasure(){
+        for(int i = 0; i < 4;i++){
+            send(link("0100ca8b0100",SockTools.convertInt2bytestr(1,4) + SockTools.convertInt2bytestr(i,4)));
+        }
+
+    }
+    // TODO:皇家军营
+    private void HuangjiaJunYing(){
+        print(link("0100bc8a0100","0400313533356d0000000a00000000000000"));
+        send(link("0100bc8a0100","0400313533356d0000000a00000000000000"));
+    }
+    // TODO:每个月的累计签到
+    private void SigninPerMonth(){
+        send(link("0100d48b0100",""));
+    }
+    // TODO:观星
+    private void guanXing(){
+        send(link("0100148d0100",SockTools.convertInt2Hexstr(6,4) + SockTools.convertInt2Hexstr(10,8)));
+    }
+    // TODO:领取洛阳福利
+    private void getGiftFromLuoYang(){
+        for(int i = 0; i < 10;i++){
+            send(link("01002a8d0100",SockTools.convertInt2Hexstr(i,4)));
+        }
+    }
+    // TODO:巡墙
+    private void patrol(int start,int times){
+        getGeralsInfo();
+        String id = generals.getLowGeneral();
+        // 没有低级将领
+        if(id == null){
+            print("Three is no low general");
+            return;
+        }
+        else{
+            print(id);
+        }
+        for(int i = start;i < start + times;i++){
+            // 发送指令
+            send(link("0100438d0100",convertInt2bytestr(i,4) + SockTools.converID2Hexstr(id)));
+            //receiveSocketNoReturn("0200438d0100");
+        }
+        // 解雇将领
+        send(link("010002880100",SockTools.converID2Hexstr(id)));
+        receiveSocketNoReturn("020002880100");
     }
     
     // TODO:签到，领取礼包
@@ -61,16 +119,17 @@ public class socketService extends IntentService {
             data = link("0100428a0100", "");
             send(data);
         }catch (Exception e){
-            System.out.println("void giftForSignin() Error");
+            print("void giftForSignin() Error");
             return;
         }
     }
 
     // TODO:获取将领信息
     private String getGeralsInfo(){
+        generals.clear();
         try {
             String data = link("010031870100", "00000000");
-            //System.out.println(data);
+
             while (send(data)) {
                 if((data = receiveSocket("020031870100")) == null){
                     continue;
@@ -98,7 +157,7 @@ public class socketService extends IntentService {
                 return "";
             }
         }catch (Exception e){
-            System.out.println("String getGeralsInfo() Error");
+            print("String getGeralsInfo() Error");
             return null;
         }
         return null;
@@ -108,7 +167,7 @@ public class socketService extends IntentService {
     private String getMonarchInfo(){
         try {
             String data = link("0100a6880100", "01000000");
-            System.out.println(data);
+            print(data);
             while (send(data)) {
                 if((data = receiveSocket("03002c880100")) == null){
                     continue;
@@ -117,7 +176,7 @@ public class socketService extends IntentService {
                 return new String(convertHexstr2byte(data.substring(30 * 2, (30 + num) * 2)), "utf-8");
             }
         }catch (Exception e){
-            System.out.println("String getMonarchInfo() Error");
+            print("String getMonarchInfo() Error");
             return null;
         }
         return null;
@@ -132,7 +191,7 @@ public class socketService extends IntentService {
             Thread.sleep(10);
             return true;
         }catch (Exception e){
-            System.out.println("boolean send(String data) error");
+            print("boolean send(String data) error");
             e.printStackTrace();
             return false;
         }
@@ -160,7 +219,7 @@ public class socketService extends IntentService {
                 }
             }
         }catch (Exception e){
-            System.out.println("String receiveSocket(String header) Error");
+            print("String receiveSocket(String header) Error");
             e.printStackTrace();
             return null;
         }
@@ -185,7 +244,7 @@ public class socketService extends IntentService {
                 }
             }
         }catch (Exception e){
-            System.out.println("boolean receiveSocketNoReturn(String header) Error");
+            print("boolean receiveSocketNoReturn(String header) Error");
             e.printStackTrace();
             return false;
         }
@@ -215,9 +274,12 @@ public class socketService extends IntentService {
                     }
                     Thread.sleep(3);
                 }
-                temp = inputStream.read(buffer);
+                if((temp = inputStream.read(buffer)) < 0){
+                    continue;
+                }
                 s_num += temp;
                 if(isreturn){
+                    //print("tmp:" + temp);
                     s += SockTools.convertBytes2Hexstr(buffer, temp);
                 }
                 if (s_num < length) {
@@ -234,7 +296,7 @@ public class socketService extends IntentService {
             }
 
         }catch(Exception e){
-            System.out.println("String getLenthString Error");
+            print("String getLenthString Error");
             e.printStackTrace();
             return null;
         }
@@ -242,6 +304,7 @@ public class socketService extends IntentService {
     // TODO:登陆
     private Socket login(String host,String port,String g_server_id,String pass_type,String g_pass_port,String g_pass_token,String g_version){
 
+        print("服务器IP:" + host);
         try {
             socket = new Socket(host, Integer.valueOf(port).intValue());
             socket.setSoTimeout(10000);
@@ -251,6 +314,7 @@ public class socketService extends IntentService {
             String data = "0000000000000000000000000000000000000000000000";
             os.write(convertHexstr2byte(data));
             os.flush();
+
 
             //TODO:发送登录信息
             data = "0100c8000000010000000000000061000000";
@@ -294,7 +358,6 @@ public class socketService extends IntentService {
         int num = 0;
         for(int i = 0;i < numstr.length()/2;i++){
             num = num + (Integer.parseInt(numstr.substring(2*i,2*i + 2), 16)<<(i*8));
-            //System.out.println(Integer.parseInt(numstr.substring(2*i,2*i + 2), 16));
         }
         return num;
     }

@@ -7,11 +7,15 @@ import java.util.List;
 
 public class SockTools {
 
+    public static void print(Object str){
+        System.out.println(str);
+    }
     // TODO:将id转化为长度信息+id模式
     public static String converID2Hexstr(String id){
         try {
-            String idstr = convertBytes2Hexstr(id.getBytes("UTF-8"),(id.getBytes("UTF-8")).length);
-            String hexstr = convertInt2bytestr(idstr.length(),2);
+            int length = (id.getBytes("UTF-8")).length;
+            String idstr = convertBytes2Hexstr(id.getBytes("UTF-8"),length);
+            String hexstr = convertInt2bytestr(length,2);
             return hexstr + idstr;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -79,6 +83,20 @@ public class SockTools {
             //System.out.println(Integer.parseInt(numstr.substring(2*i,2*i + 2), 16));
         }
         return num;
+    }
+    // TODO:将整数变为十六进制的字符串
+    public static  String convertInt2Hexstr(int num,int length) {
+        String str = "";
+        String tmp = "";
+        for(int i = 0;i < length;i++){
+            tmp = Integer.toHexString(num - ((num>>8)<<8));
+            if(tmp.length() == 1){
+                tmp = "0" + tmp;
+            }
+            str += tmp;
+            num = num>>8;
+        }
+        return str;
     }
     // TODO:将整数变为十六进制的字符串
     public static  String convertInt2bytestr(int num,int length) {

@@ -35,8 +35,8 @@ public class httpService extends IntentService {
         if("login".equals(action))
         {
             // 获取用户名，密码，验证码，验证码cookieID
-            String name = "tyboss";
-            String password = "8866123";
+            String name = "";
+            String password = "";
             String verficationCode = intent.getExtras().getString("verficationCode");
             String verificationCookie = intent.getExtras().getString("verificationCookie");
 
@@ -56,8 +56,8 @@ public class httpService extends IntentService {
             if((int)list.get(0) == 200){
                 System.out.println("登陆结果："+(String)list.get(1));
             }
-            url = "http://s2085.sg2.ledu.com/";
-            host = "s2085.sg2.ledu.com";
+            url = "http://s2113.sg2.ledu.com/";
+            host = "s2113.sg2.ledu.com";
             refer = "";
             cookie = createCookie(set_cookie);
             //System.out.println(cookie);
@@ -71,9 +71,9 @@ public class httpService extends IntentService {
                 //System.out.println("主页结果："+(String)list.get(1));
             }
 
-            url = "http://pass.ledu.com/api/game/start?gs_domain=http%3A%2F%2Fs2085.server-sg2.ledu.com";
+            url = "http://pass.ledu.com/api/game/start?gs_domain=http%3A%2F%2Fs2113.server-sg2.ledu.com";
             host = "pass.ledu.com";
-            refer = "http://s2085.sg2.ledu.com/";
+            refer = "http://s2113.sg2.ledu.com/";
             cookie = createCookie(set_cookie);
 
             urlConnect = getHttpURLConnection(url, host, refer, cookie);
@@ -83,17 +83,17 @@ public class httpService extends IntentService {
                 //System.out.println("主页结果："+(String)list.get(1));
                 url = (String)list.get(1);
                 cookie = createCookie(set_cookie);
-                host = "s2085.server-sg2.ledu.com";
-                refer = "http://s2085.sg2.ledu.com/";
+                host = "s2113.server-sg2.ledu.com";
+                refer = "http://s2113.sg2.ledu.com/";
 
                 urlConnect = getHttpURLConnection(url, host, refer, cookie);
                 set_cookie.putAll(getCookie(urlConnect));
             }
 
-            url = "http://s2085.server-sg2.ledu.com/";
+            url = "http://s2113.server-sg2.ledu.com/";
             cookie = createCookie(set_cookie);
-            host = "s2085.server-sg2.ledu.com";
-            refer = "http://s2085.sg2.ledu.com/";
+            host = "s2113.server-sg2.ledu.com";
+            refer = "http://s2113.sg2.ledu.com/";
 
             urlConnect = getHttpURLConnection(url, host, refer, cookie);
             set_cookie.putAll(getCookie(urlConnect));

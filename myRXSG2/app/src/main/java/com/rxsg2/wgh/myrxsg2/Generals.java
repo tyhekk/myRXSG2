@@ -18,6 +18,9 @@ public class Generals {
             }
         }
     }
+    public void clear(){
+        list.clear();
+    }
     // 随机获取一个低级（不需要的将领）ID
     public String getLowGeneral(){
         for(General general:list){
@@ -26,6 +29,10 @@ public class Generals {
             }
         }
         return null;
+    }
+
+    public boolean isUpdate(){
+        return list.size() == 0?false:true;
     }
 }
 // 存放将领信息
@@ -48,7 +55,7 @@ class General {
                    int Status, String CityName,int PosXY, double Power,double Captain,
                    double Interior,double Brave,double Intelligence){
         setProperties(id,OringnalQuality,Name,Quality,Level,Status,CityName,PosXY,Power,Captain,Interior,Brave,Intelligence);
-        print();
+        //print();
     }
 
     public void setProperties(String id,int OringnalQuality,String Name,int Quality,int Level,
@@ -88,9 +95,13 @@ class General {
     public int getQuanlity(){
         return this.Quality;
     }
+    public int getLevel(){return Level;}
 
     public void print(){
         System.out.println("ID:" + id);
+        if(false){
+            return;
+        }
         System.out.println("初始品质:" + OringnalQuality);
         System.out.println("将领姓名:" + Name);
         System.out.println("将领现在品质:" + Quality);
